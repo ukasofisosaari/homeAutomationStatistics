@@ -25,7 +25,7 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 
-void sendMessage() ; // Prototype so PlatformIO doesn't complain
+void sendMessage() ;
 
 painlessMesh  mesh;
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
@@ -35,7 +35,7 @@ void nodeTimeAdjustedCallback(int32_t offset) {
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
 //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
   mesh.setDebugMsgTypes( ERROR | STARTUP );  // set before init() so that you can see startup messages
@@ -67,8 +67,7 @@ void sendMessage() {
     
     String msg = "";
     if(error_msg.length() == 0) {
-      msg = mesh.getNodeId();
-      msg += ";H;" + String(h) + ";T;" + String(t) + ";\n";
+      msg =";"+mesh.getNodeId()+ ";H;" + String(h) + ";T;" + String(t) + ";\n";
     }
     else {
       msg = mesh.getNodeId();
