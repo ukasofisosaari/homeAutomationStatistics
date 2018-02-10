@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import time
+from time import gmtime, strftime
 import serial
 import requests
 SERIAL_PORT='/dev/ttyUSB0'
@@ -34,13 +34,29 @@ def main():
 	while 1 and ser:
 		mesh_msg=str(ser.readline()).split(';')
 		if len(mesh_msg) == N_FIELDS_IN_MSG and mesh_msg[1] == 'R':
-			print(mesh_msg)
-			query = {'data': mesh_msg, 'time': "time"}
+
+			sensor_data={}
+			for i in range(len(mesh_msg)):
+				if mesh_msg[i] == 'R':
+					sensor_data['node_id'] = mesh_msg[i+1]
+				elif mesh_msg[i] == 'H':
+					sensor_data['humidity'] = mesh_msg[i+1]
+				elif mesh_msg[i] == 'T':
+					sensor_data['temperature'] = mesh_msg[i+1]
+			sensor_data['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+			print(sensor_data)
+			data_array.append(sensor_data)
+		
+		if len(data_array) > 10:
+			query = {'data': data_array}
+			print(query)
 			try:
 				res = requests.post(URL, data=query)
 				print(res.text)
+				data_array = []
 			except requests.exceptions.InvalidSchema as e:
 				print(e)
+				
 		
 		
 if __name__ == "__main__":
