@@ -1,24 +1,48 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 import time
 import serial
 import requests
+SERIAL_PORT='/dev/ttyUSB0'
+BAUDRATE=9600
+URL = 'localhost:3001/api/data'
+N_FIELDS_IN_MSG=11
 
+def main():
+	try:
+		ser = serial.Serial(
+		  
+			port=SERIAL_PORT,
+			baudrate = 9600,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE,
+			bytesize=serial.EIGHTBITS,
+			timeout=1
+		)
+	except serial.serialutil.SerialException:
+		ser=None
+		try:
+			query = {'error_msg': "No device on serial port: {}".format(SERIAL_PORT), 'time': "time"}
+			print(query)
+			res = requests.post(URL, data=query)
+			print(res.text)
+		except requests.exceptions.InvalidSchema as e:
+			print(e)
+		
+	counter=0
+	data_array = []
 
-ser = serial.Serial(
-  
-    port='/dev/ttyUSB0',
-    baudrate = 9600,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS,
-    timeout=1
-)
-counter=0
-url = 'localhost:3001/api/data'
-
-while 1:
-    x=ser.readline()
-    print x
-    query = {'data': x}
-    res = requests.post(url, data=query)
-    print(res.text)
+	while 1 and ser:
+		mesh_msg=str(ser.readline()).split(';')
+		if len(mesh_msg) == N_FIELDS_IN_MSG and mesh_msg[1] == 'R':
+			print(mesh_msg)
+			query = {'data': mesh_msg, 'time': "time"}
+			try:
+				res = requests.post(URL, data=query)
+				print(res.text)
+			except requests.exceptions.InvalidSchema as e:
+				print(e)
+		
+		
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
