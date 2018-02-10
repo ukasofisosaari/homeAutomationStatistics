@@ -2,17 +2,23 @@ matrix:
   include:
     - language: python
       python: 3.5
+      before_script:
+        - cd gateway
       install:
         - pip install requests serial pylint
       script:
-        - pylint gateway/gateway.py
+        - pylint gateway.py
 
     - language: node_js
       node_js:
         - "node"
         - "8"
+      before_script:
+        - cd server
+      install:
+        - npm install
       script:
-
+        - npm run test
 notifications:
   email:
     - saku.rautiainen@iki.fi
