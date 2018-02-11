@@ -30,7 +30,7 @@ def main():
     baudrate = config.get('general', 'Baudrate')
     web_url = config.get('general', 'WebServerURL')
     n_fields_in_msg = config.get('general', 'n_fields_in_msg')
-    
+
     try:
         ser = serial.Serial(
             port=serial_port,
@@ -72,7 +72,7 @@ def main():
         if len(data_array) > 10:
             query = {'data': data_array}
             post_to_web_server(web_url, query)
-            data_array=[]
+            data_array = []
 
 
 if __name__ == "__main__":
