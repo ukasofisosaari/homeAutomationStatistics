@@ -5,10 +5,9 @@ matrix:
       before_script:
         - cd gateway
       install:
-        - pip install requests serial pylint
+        - pip install requests pyserial pylint
       script:
-        - static_testing
-          - pylint gateway.py
+        - pylint gateway.py
           
     - language: node_js
       node_js:
