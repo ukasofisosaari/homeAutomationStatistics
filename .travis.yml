@@ -15,15 +15,13 @@ matrix:
         - "node"
         - "8"
       before_install:
-        - echo $PWD
-        - echo $HOME
-        - ls $PWD
-        - cd server
-      before_script:
+        - cwd
+        - ls
         - cd server
       install:
-        - echo $PWD
         - npm install
+      before_script:
+        - ls
       script:
         - echo $PWD
         - npm start
