@@ -26,6 +26,7 @@ matrix:
         - npm install
       script:
         - echo $PWD
+        - npm start
         
     - language: c
       before_install:
