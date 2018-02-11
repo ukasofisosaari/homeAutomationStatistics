@@ -15,18 +15,17 @@ matrix:
         - "node"
         - "8"
       before_install:
-        - "echo $PWD"
-        - "echo $HOME"
-        - "ls $PWD"
+        - echo $PWD
+        - echo $HOME
+        - ls $PWD
         - cd server
       before_script:
         - cd server
       install:
-        - "echo $PWD"
+        - echo $PWD
         - npm install
       script:
-        - "echo $PWD"
-        - npm run test
+        - echo $PWD
         
     - language: c
       before_install:
