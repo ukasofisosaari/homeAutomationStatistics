@@ -15,7 +15,6 @@ matrix:
         - "node"
         - "8"
       before_install:
-        - cwd
         - ls
         - cd server
       install:
