@@ -7,8 +7,9 @@ matrix:
       install:
         - pip install requests serial pylint
       script:
-        - pylint gateway.py
-
+        - static_testing
+          - pylint gateway.py
+          
     - language: node_js
       node_js:
         - "node"
@@ -26,6 +27,34 @@ matrix:
       script:
         - "echo $PWD"
         - npm run test
+        
+    - language: c
+      before_install:
+        - wget http://downloads.arduino.cc/arduino-1.6.5-linux64.tar.xz
+        - tar xf arduino-1.6.5-linux64.tar.xz
+        - sudo mv arduino-1.6.5 /usr/local/share/arduino
+        - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+      install:
+        # boards manager not working on 1.6.7 - 1.6.8
+        - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/versions/2.3.0/package_esp8266com_index.json" --save-prefs
+        # install lib arduino json not working in 1.6.5
+        #  - arduino --install-library "ArduinoJson"
+        - git clone https://github.com/bblanchon/ArduinoJson /usr/local/share/arduino/libraries/ArduinoJson
+        - git clone https://gitlab.com/BlackEdder/painlessMesh.git /usr/local/share/arduino/libraries/painlessMesh
+        - git clone https://github.com/adafruit/Adafruit_Sensor.git /usr/local/share/arduino/libraries/Adafruit_Unified_Sensor
+        - git clone https://github.com/adafruit/DHT-sensor-library.git /usr/local/share/arduino/libraries/DHT_sensor_library
+        - arduino --install-boards esp8266:esp8266 
+        - arduino --board esp8266:esp8266:generic --save-prefs
+        - arduino --pref "compiler.warning_level=all" --save-prefs
+      script:
+        - "echo $PWD"
+        - "echo $HOME"
+        - "ls $PWD"
+        - "cat gateway.ino"
+        - arduino -v --verbose-build --verify gateway.ino
+      #after_success:
+      #  - bash <(curl -s https://codecov.io/bash)  
+        
 notifications:
   email:
     - saku.rautiainen@iki.fi

@@ -66,6 +66,7 @@ def main():
         if len(data_array) > 10:
             query = {'data': data_array}
             post_to_web_server(query)
+            data_array=[]
 
 
 if __name__ == "__main__":

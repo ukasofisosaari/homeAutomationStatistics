@@ -57,6 +57,8 @@ void sendMessage() {
     }
   
     mesh.sendBroadcast( msg );
+    
+    Serial.printf(" Sent message;%s", msg.c_str());
     taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
@@ -105,9 +107,11 @@ void setup() {
     taskSendMessage.enable() ;
   }
   Serial.print(error_msg);
+  Serial.printf("Setup Done");
 
 }
 
 void loop() {
   mesh.update();
+  //Serial.printf("Setup Done");
 }
