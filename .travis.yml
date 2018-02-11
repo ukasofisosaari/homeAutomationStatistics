@@ -16,17 +16,20 @@ matrix:
         - "8"
       before_install:
         - ls
-        - cd server
       install:
+        - cd server
+        - npm install
+        - cd client
         - npm install
       before_script:
         - ls
       script:
-        - echo $PWD
-        - npm start
+        - ng build
         
     - language: c
       before_install:
+        - cd sensor_mesh
+        - cd mesh_node
         - wget http://downloads.arduino.cc/arduino-1.6.5-linux64.tar.xz
         - tar xf arduino-1.6.5-linux64.tar.xz
         - sudo mv arduino-1.6.5 /usr/local/share/arduino
@@ -44,11 +47,8 @@ matrix:
         - arduino --board esp8266:esp8266:generic --save-prefs
         - arduino --pref "compiler.warning_level=all" --save-prefs
       script:
-        - "echo $PWD"
-        - "echo $HOME"
-        - "ls $PWD"
-        - "cat gateway.ino"
-        - arduino -v --verbose-build --verify gateway.ino
+        - cat mesh_node.ino
+        - arduino -v --verbose-build --verify mesh_node.ino
       #after_success:
       #  - bash <(curl -s https://codecov.io/bash)  
         

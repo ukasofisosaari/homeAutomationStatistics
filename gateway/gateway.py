@@ -5,41 +5,47 @@
 
 #!/usr/bin/env python3
 from time import gmtime, strftime
+import configparser
+
 import socket
 import serial
 import requests
-SERIAL_PORT = '/dev/ttyUSB0'
-BAUDRATE = 9600
-URL = 'localhost:3001/api/data'
-N_FIELDS_IN_MSG = 11
 
-def post_to_web_server(query):
+
+def post_to_web_server(web_url, query):
     """ Method for posting to web server """
     query['hostname'] = socket.gethostname()
     print(query)
     try:
-        res = requests.post(URL, data=query)
+        res = requests.post(web_url, data=query)
         print(res.text)
     except requests.exceptions.InvalidSchema as request_error:
         print(request_error)
 
 def main():
     """ Main function """
+    config = configparser.ConfigParser()
+    config.read('gateway.cfg')
+    serial_port = config.get('general', 'SerialPort')
+    baudrate = config.get('general', 'Baudrate')
+    web_url = config.get('general', 'WebServerURL')
+    n_fields_in_msg = config.get('general', 'n_fields_in_msg')
+    
     try:
         ser = serial.Serial(
-            port=SERIAL_PORT,
-            baudrate=9600,
+            port=serial_port,
+            baudrate=baudrate,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
             timeout=1
         )
         print("Serial connection opened")
-    except serial.serialutil.SerialException:
+    except serial.SerialException:
         ser = None
-        query = {'error_msg' : "No device on serial port: {}".format(SERIAL_PORT),
+        query = {'error_msg' : "No device on serial port: {}".format(serial_port),
                  'time' : strftime("%Y-%m-%d %H:%M:%S", gmtime())}
-        post_to_web_server(query)
+        post_to_web_server(web_url, query)
 
 
     data_array = []
@@ -50,7 +56,7 @@ def main():
         except serial.serialutil.SerialException:
             exit(2)
         print(mesh_msg)
-        if len(mesh_msg) == N_FIELDS_IN_MSG and mesh_msg[1] == 'R':
+        if len(mesh_msg) == n_fields_in_msg and mesh_msg[1] == 'R':
 
             sensor_data = {}
             for i, value in enumerate(mesh_msg):
@@ -65,7 +71,7 @@ def main():
 
         if len(data_array) > 10:
             query = {'data': data_array}
-            post_to_web_server(query)
+            post_to_web_server(web_url, query)
             data_array=[]
 
 
