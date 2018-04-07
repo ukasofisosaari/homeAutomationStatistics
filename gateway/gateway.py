@@ -25,8 +25,7 @@ def post_to_web_server(web_url, query):
 
 def main():
     """ Main function """
-    
-    
+
     config = configparser.ConfigParser()
     config.read('gateway.cfg')
     serial_port = config.get('general', 'SerialPort')
