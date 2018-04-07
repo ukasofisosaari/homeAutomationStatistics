@@ -36,8 +36,10 @@ def main():
     n_fields_in_msg = config.get('general', 'n_fields_in_msg')
 
 
-    logging.basicConfig(filename=log_file, level=logging.DEBUG)
-    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.basicConfig(filename=log_file,
+                        format='%(asctime)s %(message)s',
+                        datefmt='%m/%d/%Y %I:%M:%S %p',
+                        level=logging.DEBUG)
 
     try:
         ser = serial.Serial(
