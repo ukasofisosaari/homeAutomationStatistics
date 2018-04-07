@@ -65,7 +65,9 @@ def main():
             mesh_msg = str(ser.readline()).split(';')
         except serial.serialutil.SerialException:
             exit(2)
-        if len(mesh_msg) == n_fields_in_msg and mesh_msg[1] == 'R':
+            logging.info(mesh_msg)
+
+        if len(mesh_msg) == int(n_fields_in_msg) and mesh_msg[1] == 'R':
             print("Got message")
             logging.info(mesh_msg)
             sensor_data = {}
