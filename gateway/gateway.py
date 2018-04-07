@@ -65,9 +65,9 @@ def main():
             mesh_msg = str(ser.readline()).split(';')
         except serial.serialutil.SerialException:
             exit(2)
-        logging.info(mesh_msg)
         if len(mesh_msg) == n_fields_in_msg and mesh_msg[1] == 'R':
-
+            print("Got message")
+            logging.info(mesh_msg)
             sensor_data = {}
             for i, value in enumerate(mesh_msg):
                 if value == 'R':
@@ -79,7 +79,8 @@ def main():
             sensor_data['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
             data_array.append(sensor_data)
 
-        if len(data_array) > 10:
+        if len(data_array) > 2:
+            logging.info("Got more than 2 to send to server")
             query = {'data': data_array}
             post_to_web_server(web_url, query)
             data_array = []
