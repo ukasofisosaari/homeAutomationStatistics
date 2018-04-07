@@ -6,6 +6,7 @@
 #!/usr/bin/env python3
 from time import gmtime, strftime
 import configparser
+import logging
 
 import socket
 import serial
@@ -15,21 +16,28 @@ import requests
 def post_to_web_server(web_url, query):
     """ Method for posting to web server """
     query['hostname'] = socket.gethostname()
-    print(query)
+    logging.info(query)
     try:
         res = requests.post(web_url, data=query)
-        print(res.text)
+        logging.info(res.text)
     except requests.exceptions.InvalidSchema as request_error:
-        print(request_error)
+        logging.info(request_error)
 
 def main():
     """ Main function """
+    
+    
     config = configparser.ConfigParser()
     config.read('gateway.cfg')
     serial_port = config.get('general', 'SerialPort')
     baudrate = config.get('general', 'Baudrate')
     web_url = config.get('general', 'WebServerURL')
+    log_file = config.get('general', 'log_file')
     n_fields_in_msg = config.get('general', 'n_fields_in_msg')
+
+
+    logging.basicConfig(filename=log_file, level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
     try:
         ser = serial.Serial(
@@ -40,7 +48,7 @@ def main():
             bytesize=serial.EIGHTBITS,
             timeout=1
         )
-        print("Serial connection opened")
+        logging.info("Serial connection opened")
     except serial.SerialException:
         ser = None
         query = {'error_msg' : "No device on serial port: {}".format(serial_port),
@@ -55,7 +63,7 @@ def main():
             mesh_msg = str(ser.readline()).split(';')
         except serial.serialutil.SerialException:
             exit(2)
-        print(mesh_msg)
+        logging.info(mesh_msg)
         if len(mesh_msg) == n_fields_in_msg and mesh_msg[1] == 'R':
 
             sensor_data = {}
