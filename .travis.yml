@@ -42,7 +42,7 @@ matrix:
         # install lib arduino json not working in 1.6.5
         #  - arduino --install-library "ArduinoJson"
         - git clone https://github.com/bblanchon/ArduinoJson /usr/local/share/arduino/libraries/ArduinoJson
-        - git clone https://gitlab.com/BlackEdder/painlessMesh.git /usr/local/share/arduino/libraries/painlessMesh
+        - git clone https://gitlab.com/painlessMesh/painlessMesh.git /usr/local/share/arduino/libraries/painlessMesh
         - git clone https://github.com/adafruit/Adafruit_Sensor.git /usr/local/share/arduino/libraries/Adafruit_Unified_Sensor
         - git clone https://github.com/adafruit/DHT-sensor-library.git /usr/local/share/arduino/libraries/DHT_sensor_library
         - arduino --install-boards esp8266:esp8266 
