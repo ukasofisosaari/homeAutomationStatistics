@@ -16,7 +16,7 @@ import requests
 def post_to_web_server(web_url, query):
     """ Method for posting to web server """
     hostname= socket.gethostname()
-    query['hostname']=
+    query['hostname']= hostname
     logging.info(query)
     try:
         try:
