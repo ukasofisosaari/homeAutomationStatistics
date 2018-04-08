@@ -15,7 +15,7 @@ import requests
 
 def post_to_web_server(web_url, query):
     """ Method for posting to web server """
-    query['hostname'] = socket.gethostname()
+    hostname= socket.gethostname()
     logging.info(query)
     try:
         res = requests.post(web_url, data=query)
@@ -78,9 +78,13 @@ def main():
                 elif value == 'T':
                     sensor_data['temperature'] = mesh_msg[i+1]
             sensor_data['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-            data_array.append(sensor_data)
+            logging.info(sensor_data)
 
-        if len(data_array) > 2:
+            post_to_web_server(web_url, sensor_data)
+
+            #data_array.append(sensor_data)
+
+        if len(data_array) < -1:
             logging.info("Got more than 2 to send to server")
             query = {'data': data_array}
             post_to_web_server(web_url, query)

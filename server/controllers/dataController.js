@@ -19,7 +19,7 @@ exports.mesh_data_packet = function (req, res) {
         var myData = {  }
 
     });
-    console.log(JSON.stringify(req.body));
+    console.log(JSON.stringify(req));
     res.send();
 
 
