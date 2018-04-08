@@ -14,7 +14,7 @@ var url = util.format("mongodb://%s:%s@%s:%s",
 
 exports.mesh_data_packet = function (req, res) {
     console.log("Inbound data packet");
-    MongoClient.connect(url, function (err, db) {
+    mongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db(jsonConfig.mongodb_database);
         var myData = {  };

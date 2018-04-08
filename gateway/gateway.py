@@ -25,10 +25,10 @@ def post_to_web_server(web_url, query):
     except requests.exceptions.InvalidSchema as request_error:
         print(request_error)
         logging.info(request_error)
-    except ConnectionError as request_error:
+    except requests.exceptions.ConnectionError as request_error:
         print(request_error)
         logging.info(request_error)
-    except ConnectionRefusedError as request_error:
+    except requests.exceptions.ConnectionRefusedError as request_error:
         print(request_error)
         logging.info(request_error)
 
