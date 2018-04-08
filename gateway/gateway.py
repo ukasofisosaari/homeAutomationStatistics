@@ -18,13 +18,18 @@ def post_to_web_server(web_url, query):
     hostname= socket.gethostname()
     query['hostname']= hostname
     logging.info(query)
+
     try:
-        try:
-            res = requests.post(web_url, data=query)
-            logging.info(res.text)
-        except requests.exceptions.InvalidSchema as request_error:
-            logging.info(request_error)
-    except ConnectionError:
+        res = requests.post(web_url, data=query)
+        logging.info(res.text)
+    except requests.exceptions.InvalidSchema as request_error:
+        print(request_error)
+        logging.info(request_error)
+    except ConnectionError as request_error:
+        print(request_error)
+        logging.info(request_error)
+    except ConnectionRefusedError as request_error:
+        print(request_error)
         logging.info(request_error)
 
 def main():
