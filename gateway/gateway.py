@@ -16,11 +16,15 @@ import requests
 def post_to_web_server(web_url, query):
     """ Method for posting to web server """
     hostname= socket.gethostname()
+    query['hostname']=
     logging.info(query)
     try:
-        res = requests.post(web_url, data=query)
-        logging.info(res.text)
-    except requests.exceptions.InvalidSchema as request_error:
+        try:
+            res = requests.post(web_url, data=query)
+            logging.info(res.text)
+        except requests.exceptions.InvalidSchema as request_error:
+            logging.info(request_error)
+    except ConnectionError:
         logging.info(request_error)
 
 def main():

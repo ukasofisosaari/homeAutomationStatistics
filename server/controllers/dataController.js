@@ -16,10 +16,15 @@ exports.mesh_data_packet = function (req, res) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db(jsonConfig.mongodb_database);
-        var myData = {  }
-
+        var myData = {  };
+        dbo.collection(
+            jsonConfig.mongodb_collection_data).insertOne(req.body, function(err, res) {
+            if (err) throw err;
+            console.log("1 document inserted");
+            db.close();
+        });
     });
-    console.log(JSON.stringify(req));
+    console.log(JSON.stringify(req.body));
     res.send();
 
 
