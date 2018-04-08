@@ -13,13 +13,17 @@ var url = util.format("mongodb://%s:%s@%s:%s",
 
 
 exports.mesh_data_packet = function (req, res) {
+    console.log("Inbound data packet");
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db(jsonConfig.mongodb_database);
         var myData = {  };
         dbo.collection(
             jsonConfig.mongodb_collection_data).insertOne(req.body, function(err, res) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                throw err;
+            }
             console.log("1 document inserted");
             db.close();
         });
