@@ -1,0 +1,9 @@
+{
+  "mongodb_username": "has",
+  "mongodb_pwd": "username",
+  "mongodb_url": "address",
+  "mongodb_port": "port",
+  "mongodb_database": "has",
+  "mongodb_collection_data": "data",
+  "mongodb_collection_sensor_nodes": "sensor_nodes"
+}
