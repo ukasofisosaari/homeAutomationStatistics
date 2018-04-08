@@ -1,9 +1,9 @@
 {
   "mongodb_username": "has",
-  "mongodb_pwd": "pwd",
-  "mongodb_url": "localhost",
+  "mongodb_pwd": "ris1234",
+  "mongodb_url": "192.168.10.64",
   "mongodb_port": "27017",
   "mongodb_database": "has",
   "mongodb_collection_data": "data",
-  "mongodb_collection_sensor_nodes": "sensor_nodes"
+  "mongodb_collection_mesh_networks": "mesh_sensor_networks"
 }
