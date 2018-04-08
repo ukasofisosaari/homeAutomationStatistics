@@ -3,7 +3,7 @@ var util = require("util");
 const fs = require("fs");
 const jsonConfig = JSON.parse(fs.readFileSync("./config/config.json"));
 
-var url = util.format("mongodb://%s:%s@%s:%s",
+var url = util.format("mongodb://%s:%s@%s/%s",
     jsonConfig.mongodb_username,
     jsonConfig.mongodb_pwd,
     jsonConfig.mongodb_url,
