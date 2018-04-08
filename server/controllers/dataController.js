@@ -3,7 +3,7 @@ var util = require("util");
 const fs = require("fs");
 const jsonConfig = JSON.parse(fs.readFileSync("./config/config.json"));
 
-var url = util.format("mongodb://%s:%s@%s/%s",
+var url = util.format("mongodb://%s:%s@%s:%s/%s",
     jsonConfig.mongodb_username,
     jsonConfig.mongodb_pwd,
     jsonConfig.mongodb_url,
@@ -16,14 +16,9 @@ exports.mesh_data_packet = function (req, res) {
     console.log("Inbound data packet");
     mongoClient.connect(url, function (err, db) {
         if (err) throw err;
-        var dbo = db.db(jsonConfig.mongodb_database);
-        var myData = {  };
-        dbo.collection(
+        db.collection(
             jsonConfig.mongodb_collection_data).insertOne(req.body, function(err, res) {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
+            if (err) throw err;
             console.log("1 document inserted");
             db.close();
         });
