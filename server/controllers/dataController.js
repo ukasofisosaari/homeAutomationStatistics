@@ -1,15 +1,6 @@
-var mongoClient = require("mongodb").MongoClient;
-var util = require("util");
-const fs = require("fs");
-const jsonConfig = JSON.parse(fs.readFileSync("./config/config.json"));
-
-var url = util.format("mongodb://%s:%s@%s:%s/%s",
-    jsonConfig.mongodb_username,
-    jsonConfig.mongodb_pwd,
-    jsonConfig.mongodb_url,
-    jsonConfig.mongodb_port,
-    jsonConfig.mongodb_database
-);
+const mongoClient = require("mongodb").MongoClient;
+const url = require("../config/db").url;
+const jsonConfig = require("../config/db").jsonConfig;
 
 
 exports.mesh_data_packet = function (req, res) {
@@ -29,6 +20,7 @@ exports.mesh_data_packet = function (req, res) {
 };
 
 exports.mesh_networks = function (req, res) {
+    console.log(url);
     console.log(req.params);
     const mesh_name = req.params.mesh_network_name;
     const query = {hostname: mesh_name};
