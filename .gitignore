@@ -108,3 +108,6 @@ typings/
 # dotenv environment variables file
 .env
 
+*.iml
+*.xml
+*.xml
