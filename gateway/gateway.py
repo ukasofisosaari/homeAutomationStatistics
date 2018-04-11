@@ -59,11 +59,13 @@ def main():
             timeout=1
         )
         logging.info("Serial connection opened")
-    except serial.SerialException:
+    except serial.SerialException as e:
+        print("No device on serial port: " + serial_port)
+        print(e)
         ser = None
-        query = {'error_msg' : "No device on serial port: {}".format(serial_port),
+        query = {'error_msg' : "No device on serial port: {0}".format(serial_port),
                  'time' : strftime("%Y-%m-%d %H:%M:%S", gmtime())}
-        post_to_web_server(web_url, query)
+        #post_to_web_server(web_url, query)
 
 
     data_array = []
