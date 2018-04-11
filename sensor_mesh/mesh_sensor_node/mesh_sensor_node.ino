@@ -30,7 +30,7 @@ enum meshNodeType {
 meshNodeType node_type = MESH_UNKNOWN;
 void sendMessage() ;
 painlessMesh  mesh;
-Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
+Task taskSendMessage( TASK_SECOND * 60 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
     String error_msg = "";

@@ -2,9 +2,10 @@ const mongoClient = require("mongodb").MongoClient;
 const url = require("../config/db").url;
 const jsonConfig = require("../config/db").jsonConfig;
 
-
 exports.mesh_data_packet = function (req, res) {
     console.log("Inbound data packet");
+    var data_packet = req.body;
+    data_packet["time"] = Date(data_packet["time"]);
     mongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db(jsonConfig.mongodb_database);
@@ -41,13 +42,18 @@ exports.mesh_network_data = function (req, res) {
     console.log(req.params);
     mongoClient.connect(url, function (err, db) {
         const mesh_name = req.params.mesh_network_name;
+        const start_date = req.query.start_date;
+        const end_date = req.query.end_date;
+        console.log(start_date);
+        console.log(end_date);
+        console.log(Date(start_date));
         const query = {hostname: mesh_name};
         if (err) throw err;
         var dbo = db.db(jsonConfig.mongodb_database);
         dbo.collection(
             jsonConfig.mongodb_collection_data).find(query).toArray(function(err, result) {
             if (err) throw err;
-            console.log(result);
+            //console.log(result);
             db.close();
             res.send(result);
         });
