@@ -1,0 +1,12 @@
+{
+  "presets": [
+    "es2015",
+    "react",
+    "react-hmre",
+    "stage-2"
+  ],
+  "plugins":[
+    ["babel-plugin-add-module-exports"],
+    ["transform-object-rest-spread"]
+  ]
+}
