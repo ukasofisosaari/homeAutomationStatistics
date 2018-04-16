@@ -1,9 +1,14 @@
 // Webpack Config
 const BabiliPlugin = require('babili-webpack-plugin');
+const webpack = require('webpack');
 const path = require('path');
-const { env } = require('yargs').argv;
+const { argv: { env } } = require('yargs');
 
+//Set the api endpoint as an environment variable
 const plugins = [];
+plugins.push(new webpack.DefinePlugin({
+  'process.env.API_URL': JSON.stringify(process.env.API_URL || 'http://isosaari.dy.fi:3001/api'),
+}))
 let devServer = {};
 let devtool = '';
 //For build mode we output a minified file. This is what will be published to npm.
@@ -39,7 +44,7 @@ module.exports = {
       },
       {
         test: /\.(js|jsx)$/,
-        loader: "eslint-loader",
+        loader: 'eslint-loader',
         exclude: /node_modules/,
       },
       {
