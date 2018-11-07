@@ -1,90 +1,27 @@
 {
   "parser": "babel-eslint",
-  "extends": "airbnb",
-  "plugins": ["react"],
+  "globals": {
+    "document": false
+  },
   "env": {
     "browser": true,
-    "commonjs": true,
-    "es6": true,
-    "jest": true,
     "node": true
   },
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true,
-      "generators": true,
-      "experimentalObjectRestSpread": true
-    }
-  },
-  "settings": {
-    "import/ignore": [
-      "node_modules",
-      "\\.(json|css|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$"
-    ],
-    "import/extensions": [".js", ".jsx"],
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".json"]
-      }
-    }
-  },
+  "plugins": ["react"],
   "rules": {
-    "react/jsx-filename-extension": "off",
-    "react/forbid-prop-types": "warn",
-    "react/no-unused-prop-types": ["warn", { "customValidators": [], "skipShapeProps": true }],
-    "arrow-body-style": "off",
-    "import/no-extraneous-dependencies": "off",
-    "import/imports-first": "off",
-    "no-constant-condition": "off",
-    "semi": "off",
-    "radix": "off",
-    "class-methods-use-this": "off",
-    "no-debugger": "warn",
-    "prefer-template": "warn",
-    "prefer-const": "warn",
-    "prefer-destructuring": "warn",
-    "no-param-reassign": "warn",
-    "no-plusplus": "off",
-    "no-restricted-syntax": "warn",
-    "spaced-comment": "off",
-    "no-underscore-dangle": "off",
-    "object-shorthand": "warn",
-    "comma-dangle": "warn",
-    "arrow-parens": "warn",
-    "max-len": "warn",
-    "guard-for-in": "warn",
-    "camelcase": "off",
-    "object-curly-spacing": "warn",
-    "object-curly-newline": "warn",
-    "func-names": "warn",
-    "prefer-arrow-callback": "warn",
-    "brace-style": "warn",
-    "no-unused-vars": "warn",
-    "no-extra-boolean-cast": "warn",
-    "no-prototype-builtins": "warn",
-    "no-nested-ternary": "warn",
-    "consistent-return": "off",
-    "array-callback-return": "off",
-    "react/no-find-dom-node": "warn",
-    "jsx-a11y/anchor-is-valid": [
-      "warn",
-      {
-        "components": [
-          "Link"
-        ],
-        "specialLink": [
-          "to"
-        ],
-        "aspects": [
-          "noHref",
-          "invalidHref",
-          "preferButton"
-        ]
-      }
-    ],
-    "jsx-a11y/click-events-have-key-events": "warn",
-    "jsx-a11y/no-static-element-interactions": "warn"
-  }
+    "arrow-parens": off,
+    "implicit-arrow-linebreak": "off",
+    "import/no-unresolved": [2, { "ignore": ["^@+"] }],
+    "import/prefer-default-export": "off",
+    "no-confusing-arrow": "off",
+    "no-console": "off",
+    "no-unused-vars": ["warn", { "varsIgnorePattern": "React" }],
+    "object-curly-newline": off,
+    "react/jsx-uses-vars": "error",
+    "react/prop-types": "error",
+    "react/require-default-props": [2],
+    "react/sort-prop-types": [2],
+    "security/detect-object-injection": off
+  },
+  "extends": ["react-app", "airbnb-base"]
 }
