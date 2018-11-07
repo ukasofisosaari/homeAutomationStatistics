@@ -1,7 +1,7 @@
 {
   "mongodb_username": "has",
   "mongodb_pwd": "ris1234",
-  "mongodb_url": "192.168.10.64",
+  "mongodb_url": "192.168.1.47",
   "mongodb_port": "27017",
   "mongodb_database": "has",
   "mongodb_collection_data": "data",
