@@ -15,8 +15,8 @@ import requests
 
 def post_to_web_server(web_url, query):
     """ Method for posting to web server """
-    hostname= socket.gethostname()
-    query['hostname']= hostname
+    hostname = socket.gethostname()
+    query['hostname'] = hostname
     logging.info(query)
 
     try:
@@ -26,9 +26,6 @@ def post_to_web_server(web_url, query):
         print(request_error)
         logging.info(request_error)
     except requests.exceptions.ConnectionError as request_error:
-        print(request_error)
-        logging.info(request_error)
-    except requests.exceptions.ConnectionRefusedError as request_error:
         print(request_error)
         logging.info(request_error)
 
@@ -59,9 +56,9 @@ def main():
             timeout=1
         )
         logging.info("Serial connection opened")
-    except serial.SerialException as e:
+    except serial.SerialException as error:
         print("No device on serial port: " + serial_port)
-        print(e)
+        print(error)
         ser = None
         query = {'error_msg' : "No device on serial port: {0}".format(serial_port),
                  'time' : strftime("%Y-%m-%d %H:%M:%S", gmtime())}
