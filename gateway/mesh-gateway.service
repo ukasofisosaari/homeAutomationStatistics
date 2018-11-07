@@ -4,7 +4,8 @@ After=multi-user.target
  
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/pi/gateway.py
+ExecStart=/usr/bin/python3 /home/pi/homeAutomationStatistics/gateway/gateway.py
+WorkingDirectory=/home/pi/homeAutomationStatistics/gateway
 Restart=on-abort
  
 [Install]
