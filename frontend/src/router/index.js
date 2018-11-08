@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import { Layout } from 'antd';
 import HomePage from '../components/HomePage';
 import AboutPage from '../components/AboutPage';
@@ -10,8 +10,10 @@ export default () => (
   <Router>
     <div style={{ backgroundColor: '#EEEEEE', height: '100vh', width: '100%' }}>
       <Navbar />
-      <Route exact path="/" component={HomePage} />
-      <Route path="/about" component={AboutPage} />
+      <Switch>
+        <Route path="/about" component={AboutPage} />
+        <Route path="/" component={HomePage} />
+      </Switch>
       <Footer />
     </div>
   </Router>
