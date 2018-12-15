@@ -62,6 +62,7 @@ exports.mesh_network_data = function (req, res) {
 
 /* Doesnt work yet*/
 exports.register_mesh_network = function (req, res) {
+    
     mongoClient.connect(url, function (err, db) {
         const mesh_name = req.params.mesh_network_name;
         const query = {mesh_network_name: mesh_name};
