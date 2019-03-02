@@ -1,5 +1,6 @@
 const winston = require("winston");
 
+var fs = require('fs');
 const configFile = JSON.parse(fs.readFileSync("./config/config.json"));
 
 const level = process.env.LOG_LEVEL || 'debug';
