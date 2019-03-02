@@ -1,0 +1,12 @@
+[Unit]
+Description=HAS backend service
+After=multi-user.target
+ 
+[Service]
+Type=simple
+ExecStart=/usr/bin/npm /srv/has/server/bin/www
+WorkingDirectory=/srv/has/server/
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target
