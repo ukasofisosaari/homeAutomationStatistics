@@ -3,7 +3,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var fs = require('fs');
 var morgan = require('morgan');
-//var logger = ('./controllers/logger');
+var logger = ('./controllers/logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const configFile = JSON.parse(fs.readFileSync("./config/config.json"));
@@ -22,13 +22,13 @@ app.use(express.static(path.join(__dirname, 'client/dist')));
 //Successfulla access logging
 var accessLogStream = fs.createWriteStream(path.join(configFile.log_dir, 'access.log'), { flags: 'a' });
 app.use(morgan('combined', {skip: function (req, res) {
-        return res.statusCode < 400
+        return res.statusCode >= 400
     }, stream: accessLogStream }));
 
 //Error logging
 var errorLogStream = fs.createWriteStream(path.join(configFile.log_dir, 'error.log'), { flags: 'a' });
 app.use(morgan('combined', {skip: function (req, res) {
-        return res.statusCode >= 400
+        return res.statusCode < 400
     }, stream: errorLogStream }));
 
 app.use(bodyParser.json());
@@ -52,7 +52,7 @@ app.get('*', function (req, res) {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    //logger.error('404 page requested');
+    logger.error('404 page requested');
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
