@@ -1,9 +1,11 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var fs = require('fs');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+const configFile = JSON.parse(fs.readFileSync("./config/config.json"));
 
 var api = require('./routes/api');
 
@@ -15,7 +17,10 @@ app.use(express.static(path.join(__dirname, 'client/dist')));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+
+var accessLogStream = fs.createWriteStream(path.join(configFile.log_dir, 'access.log'), { flags: 'a' });
+app.use(morgan('combined', { stream: accessLogStream }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

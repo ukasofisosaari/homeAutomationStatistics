@@ -22,6 +22,7 @@ exports.mesh_data_packet = function (req, res) {
 
 exports.mesh_networks = function (req, res) {
     console.log(url);
+    console.log(url);
     console.log(req.params);
     const mesh_name = req.params.mesh_network_name;
     const query = {hostname: mesh_name};
