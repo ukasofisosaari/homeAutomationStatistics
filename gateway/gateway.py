@@ -35,6 +35,7 @@ def main():
     config = configparser.ConfigParser()
     config.read('gateway.cfg')
     serial_port = config.get('general', 'SerialPort')
+    n_samples = float(config.get('general', 'Samples'))
     baudrate = config.get('general', 'Baudrate')
     web_url = config.get('general', 'WebServerURL')
     log_file = config.get('general', 'log_file')
@@ -95,7 +96,7 @@ def main():
                              sensor_data['node_id']))
             except KeyError:
                 sensors_data_dict[sensor_data['node_id']] = []
-            if len(sensors_data_dict[sensor_data['node_id']]) > 60:
+            if len(sensors_data_dict[sensor_data['node_id']]) == n_samples:
                 print("Got 60 samples")
                 logging.info("Got 60 samples")
                 sensor_data_average = {}
@@ -108,8 +109,8 @@ def main():
                 for data_sample in sensors_data_dict[sensor_data['node_id']]:
                     temperature_average += float(data_sample['temperature'])
                     humidity_average += float(data_sample['humidity'])
-                temperature_average = temperature_average / 60.0
-                humidity_average = humidity_average / 60.0
+                temperature_average = temperature_average / n_samples
+                humidity_average = humidity_average / n_samples
                 sensor_data_average['temperature'] = str(temperature_average)
                 sensor_data_average['humidity'] = str(humidity_average)
                 logging.info(sensor_data_average)
