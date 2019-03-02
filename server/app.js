@@ -22,13 +22,13 @@ app.use(express.static(path.join(__dirname, 'client/dist')));
 //Successfulla access logging
 var accessLogStream = fs.createWriteStream(path.join(configFile.log_dir, 'access.log'), { flags: 'a' });
 app.use(morgan('combined', {skip: function (req, res) {
-        return res.statusCode >= 400
+        return res.statusCode < 400
     }, stream: accessLogStream }));
 
 //Error logging
 var errorLogStream = fs.createWriteStream(path.join(configFile.log_dir, 'error.log'), { flags: 'a' });
 app.use(morgan('combined', {skip: function (req, res) {
-        return res.statusCode < 400
+        return res.statusCode >= 400
     }, stream: errorLogStream }));
 
 app.use(bodyParser.json());

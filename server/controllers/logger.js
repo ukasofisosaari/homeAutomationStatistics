@@ -1,11 +1,14 @@
 const winston = require("winston");
 
+const configFile = JSON.parse(fs.readFileSync("./config/config.json"));
+
 const level = process.env.LOG_LEVEL || 'debug';
 
 const logger = new winston.Logger({
     transports: [
-        new winston.transports.Console({
+        new winston.transports.File({
             level: level,
+            filename: path.join(configFile.log_dir, 'has.log'),
             timestamp: function () {
                 return (new Date()).toISOString();
             }
@@ -13,4 +16,4 @@ const logger = new winston.Logger({
     ]
 });
 
-module.exports = logger
+module.exports = logger;
