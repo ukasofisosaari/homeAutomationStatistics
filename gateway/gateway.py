@@ -90,10 +90,9 @@ def main():
 
             try:
                 sensors_data_dict[sensor_data['node_id']].append(sensor_data)
-
-                logging.info("Sample number: {0} for sensor {1}",
+                logging.info("Sample number: {0} for sensor {1}".format(
                              str(len(sensors_data_dict[sensor_data['node_id']])),
-                             sensor_data['node_id'])
+                             sensor_data['node_id']))
             except KeyError:
                 sensors_data_dict[sensor_data['node_id']] = []
             if len(sensors_data_dict[sensor_data['node_id']]) > 60:
