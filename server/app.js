@@ -3,7 +3,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var fs = require('fs');
 var morgan = require('morgan');
-var logger = ('./controllers/logger');
+//var logger = ('./controllers/logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const configFile = JSON.parse(fs.readFileSync("./config/config.json"));
@@ -52,10 +52,10 @@ app.get('*', function (req, res) {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    logger.error('404 page requested');
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    //logger.error('404 page requested');
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
