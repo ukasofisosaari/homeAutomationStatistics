@@ -1,7 +1,7 @@
 const mongoClient = require("mongodb").MongoClient;
 const url = require("../config/db").url;
 const jsonConfig = require("../config/db").jsonConfig;
-var logger = ('./controllers/logger');
+var logger = require('./controllers/logger').logger;
 
 exports.mesh_data_packet = function (req, res) {
     logger.info("Inbound data packet");
