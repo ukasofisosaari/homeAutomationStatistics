@@ -65,7 +65,8 @@ def main():
         #post_to_web_server(web_url, query)
 
 
-    data_array = []
+    #Key is sensor id, value is array of sensor data
+    sensors_data_dict = {}
 
     while 1 and ser:
         try:
@@ -86,10 +87,30 @@ def main():
                 elif value == 'T':
                     sensor_data['temperature'] = mesh_msg[i+1]
             sensor_data['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+            try:
+                sensors_data_dict[sensor_data['node_id']].append(sensor_data)
+            except KeyError:
+                sensors_data_dict[sensor_data['node_id']] = []
+            if len(sensors_data_dict[sensor_data['node_id']]) > 60:
+                sensor_data_average = {}
+                #Set id and current time
+                sensor_data_average['node_id'] = sensor_data['node_id']
+                sensor_data_average['time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+                temperature_average = 0.0
+                humidity_average = 0.0
+                for data_sample in sensors_data_dict[sensor_data['node_id']]:
+                    temperature_average += float(data_sample['temperature'])
+                    humidity_average += float(data_sample['humidity'])
+                temperature_average = temperature_average / 60.0
+                humidity_average = humidity_average / 60.0
+                sensor_data_average['temperature'] = str(temperature_average)
+                sensor_data_average['humidity'] = str(humidity_average)
+                logging.info(sensor_data)
             logging.info(sensor_data)
 
             post_to_web_server(web_url, sensor_data)
-
             #data_array.append(sensor_data)
 
         if len(data_array) < -1:
