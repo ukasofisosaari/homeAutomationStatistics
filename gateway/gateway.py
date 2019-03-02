@@ -90,9 +90,15 @@ def main():
 
             try:
                 sensors_data_dict[sensor_data['node_id']].append(sensor_data)
+
+                logging.info("Sample number: {0} for sensor {1}",
+                             str(len(sensors_data_dict[sensor_data['node_id']])),
+                             sensor_data['node_id'])
             except KeyError:
                 sensors_data_dict[sensor_data['node_id']] = []
             if len(sensors_data_dict[sensor_data['node_id']]) > 60:
+                print("Got 60 samples")
+                logging.info("Got 60 samples")
                 sensor_data_average = {}
                 #Set id and current time
                 sensor_data_average['node_id'] = sensor_data['node_id']
