@@ -108,16 +108,9 @@ def main():
                 sensor_data_average['temperature'] = str(temperature_average)
                 sensor_data_average['humidity'] = str(humidity_average)
                 logging.info(sensor_data_average)
+                post_to_web_server(web_url, sensor_data_average)
 
 
-            post_to_web_server(web_url, sensor_data)
-            #data_array.append(sensor_data)
-
-        if len(data_array) < -1:
-            logging.info("Got more than 2 to send to server")
-            query = {'data': data_array}
-            post_to_web_server(web_url, query)
-            data_array = []
 
 
 if __name__ == "__main__":
