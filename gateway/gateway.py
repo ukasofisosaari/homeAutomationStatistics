@@ -107,8 +107,8 @@ def main():
                 humidity_average = humidity_average / 60.0
                 sensor_data_average['temperature'] = str(temperature_average)
                 sensor_data_average['humidity'] = str(humidity_average)
-                logging.info(sensor_data)
-            logging.info(sensor_data)
+                logging.info(sensor_data_average)
+
 
             post_to_web_server(web_url, sensor_data)
             #data_array.append(sensor_data)
