@@ -8,6 +8,7 @@
 from time import gmtime, strftime, sleep
 import socket
 import configparser
+import json
 
 
 import serial
@@ -17,10 +18,6 @@ from paho.mqtt.client import MQTT_ERR_SUCCESS, MQTT_ERR_NO_CONN
 from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_ERROR
 from definitions import NODE_ID_KEY, TEMPERATURE_KEY, HUMIDITY_KEY
 from logger import LoggerPrinter
-
-# Key is node id, value is location.
-# TODO: support setting this on the run.
-OBJECTS = {"3943546298" : "pirtti", "572294245" : "sauna"}
 
 class MeshGateway():
     """ Mesh gateway class, parses mesh network messages
@@ -40,6 +37,14 @@ class MeshGateway():
         log_file = config.get('general', 'log_file')
         self._logger = LoggerPrinter(log_file)
         self._mqtt_client = None
+        self._nodes = None
+        try:
+            nodes_file = open("nodes.json")
+            self._nodes = json.load(nodes_file)
+        except FileNotFoundError:
+            self._logger.loggingPrinting("No nodes.json file found, generate it first",
+                                         LOGGING_LEVEL_INFO)
+            exit()
 
     def _openSerialConnection(self):
         """ Open serial connection"""
@@ -138,10 +143,14 @@ class MeshGateway():
     def _post_to_mqtt_broker(self, sensor_data_dict):
         """ Method for posting to MQTT broker """
         try:
-            location = OBJECTS[sensor_data_dict[NODE_ID_KEY]]
+            location = self._nodes[sensor_data_dict[NODE_ID_KEY]]
         except KeyError:
-            # TODO: Add to objects somehow
-            pass
+            self._logger.loggingPrinting(
+                f"No location for mesh node {sensor_data_dict[NODE_ID_KEY]} found",
+                LOGGING_LEVEL_INFO)
+            self._logger.loggingPrinting(
+                "Regenerate json and restart gateway service",
+                LOGGING_LEVEL_INFO)
         try:
             rc, mid = self._mqtt_client.publish(f"hakala/{location}/temp",
                                           sensor_data_dict[TEMPERATURE_KEY])
