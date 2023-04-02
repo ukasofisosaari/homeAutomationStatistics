@@ -1,51 +1,49 @@
 //************************************************************
-// Sensor node code for wemos DHT12 shield
+// Sensor node with DS18B20 temperature sensor
 //
-// 
-// 
+// 1. Reads temperature sensor
+// 2. Sends it to mesh network
 //
 //
 //************************************************************
 #include <painlessMesh.h>
-#include <WEMOS_DHT12.h>
-
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #define   MESH_PREFIX     "HakalaSensorNode"
 #define   MESH_PASSWORD   "password"
 #define   MESH_PORT       5555
 
+
 enum meshNodeType {
   MESH_GATEWAY = 1,
-  MESH_DHT_WEMOS= 2,
+  MESH_DHT_NODE= 2,
   MESH_DS18B20_NODE= 3,
   MESH_UNKNOWN = 0
 };
-meshNodeType node_type = MESH_DHT_WEMOS;
-
 void sendMessage() ;
+meshNodeType node_type = MESH_DS18B20_NODE;
 Scheduler userScheduler;
 painlessMesh  mesh;
 Task taskSendMessage( TASK_SECOND * 600 , TASK_FOREVER, &sendMessage );
 
-DHT12 dht12;
+// GPIO where the DS18B20 is connected to
+const int oneWireBus = 4;     
+
+// Setup a oneWire instance to communicate with any OneWire devices
+OneWire oneWire(oneWireBus);
+
+// Pass our oneWire reference to Dallas Temperature sensor 
+DallasTemperature sensors(&oneWire);
+
 void sendMessage() {
     String msg = ";";
-    if(dht12.get()==0){
-      // Reading temperature or humidity takes about 250 milliseconds!
-      // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-      float h = dht12.humidity;
-      // Read temperature as Celsius (the default)
-      float t = dht12.cTemp;
+    sensors.requestTemperatures(); 
+    float temperatureC = sensors.getTempCByIndex(0);
       
-      msg += mesh.getNodeId();
-      msg +=";H;" + String(h) + ";T;" + String(t) + ";\n";
-    }
-    else
-    {
-      String error_msg = "Failed to read from sensor, nodeid: ";
-      msg = mesh.getNodeId();
-      msg += error_msg;
-    }
+    msg += mesh.getNodeId();
+    msg +=";H;NO_HUMIDITY;T;" + String(temperatureC) + ";\n";
+    
   
     mesh.sendBroadcast( msg );
     
@@ -53,11 +51,8 @@ void sendMessage() {
     taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
-
-
-
 void receivedCallback( uint32_t from, String &msg ) {
-  Serial.printf(";R;%u;msg;%s", from, msg.c_str());
+  //Serial.printf(";R;%u;msg;%s", from, msg.c_str());
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -80,6 +75,8 @@ void setup() {
 
   mesh.init( MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT );
   mesh.onNodeTimeAdjusted(&nodeTimeAdjustedCallback);
+
+
   
   mesh.onReceive(&receivedCallback);
   mesh.onNewConnection(&newConnectionCallback);

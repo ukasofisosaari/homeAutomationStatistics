@@ -1,33 +1,26 @@
 //************************************************************
-// this is a simple example that uses the painlessMesh library
+// Gateway for the mesh sensor network
 //
-// 1. sends a silly message to every node on the mesh at a random time betweew 1 and 5 seconds
-// 2. prints anything it recieves to Serial.print
+// 1. Receives messages
+// 2. Prints them to serial port
 //
 //
 //************************************************************
 #include <painlessMesh.h>
-#include <painlessMeshSync.h>
-#include <painlessScheduler.h>
-
-
 
 #define   MESH_PREFIX     "HakalaSensorNode"
 #define   MESH_PASSWORD   "password"
 #define   MESH_PORT       5555
 
-
 enum meshNodeType {
   MESH_GATEWAY = 1,
-  MESH_DHT_NODE= 2,
+  MESH_DHT_WEMOS= 2,
+  MESH_DS18B20_NODE= 3,
   MESH_UNKNOWN = 0
 };
 
-meshNodeType node_type = MESH_UNKNOWN;
+meshNodeType node_type = MESH_GATEWAY;
 painlessMesh  mesh;
-
-
-
 
 
 void receivedCallback( uint32_t from, String &msg ) {
