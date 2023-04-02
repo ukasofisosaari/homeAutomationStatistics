@@ -24,7 +24,7 @@ class MeshGateway():
     and publishes them to MQTT broker"""
 
     def __init__(self):
-        """ """
+        """ Init """
         config = configparser.ConfigParser()
         config.read('gateway.cfg')
         self._mqtt_broker = config.get('general', 'MqttBroker')
@@ -80,7 +80,7 @@ class MeshGateway():
 
 
     def _processData(self, message_data):
-        """ """
+        """ Process Data """
         try:
             self._sensors_data_dict[message_data['node_id']].append(message_data)
             self._logger.loggingPrinting("Sample number: {0} for sensor {1}".format(
@@ -155,7 +155,6 @@ class MeshGateway():
             rc, mid = self._mqtt_client.publish(f"hakala/{location}/temp",
                                           sensor_data_dict[TEMPERATURE_KEY])
             if rc == MQTT_ERR_NO_CONN:
-                # TODO: Reconnect
                 self._logger.loggingPrinting(
                     "No connection MQTT broker",
                     LOGGING_LEVEL_ERROR)
