@@ -29,7 +29,7 @@ class MeshGateway():
         config.read('gateway.cfg')
         self._mqtt_broker = config.get('general', 'MqttBroker')
         self._mqtt_port = int(config.get('general', 'MqttPort'))
-        self._n_samples = float(config.get('general', 'Samples'))
+        self._sampling_count = float(config.get('general', 'sampling_count'))
         self._serial_port = config.get('general', 'SerialPort')
         self._baudrate = config.get('general', 'Baudrate')
         # Key is sensor id, value is array of sensor data
@@ -90,7 +90,7 @@ class MeshGateway():
         except KeyError:
             self._sensors_data_dict[message_data['node_id']] = []
 
-        if len(self._sensors_data_dict[message_data['node_id']]) == self._n_samples:
+        if len(self._sensors_data_dict[message_data['node_id']]) == self._sampling_count:
             sensor_data_average = self._averageSensorValues(message_data['node_id'],
                                                             self._sensors_data_dict)
             # If mqtt_client is None, this could be used to just collect data. Lots of data.
@@ -119,7 +119,7 @@ class MeshGateway():
     def _averageSensorValues(self, node_id, sensors_data_dict):
         """ Calculates average values for sensor data"""
         self._logger.loggingPrinting(
-            f"Got {self._n_samples} samples, calculating average",
+            f"Got {self._sampling_count} samples, calculating average",
                         LOGGING_LEVEL_INFO)
         sensor_data_average = {}
 
@@ -132,8 +132,8 @@ class MeshGateway():
         for data_sample in sensors_data_dict[node_id]:
             temperature_average += float(data_sample['temperature'])
             humidity_average += float(data_sample['humidity'])
-        temperature_average = temperature_average / self._n_samples
-        humidity_average = humidity_average / self._n_samples
+        temperature_average = temperature_average / self._sampling_count
+        humidity_average = humidity_average / self._sampling_count
         sensor_data_average['temperature'] = str(temperature_average)
         sensor_data_average['humidity'] = str(humidity_average)
         self._logger.loggingPrinting(sensor_data_average,
