@@ -12,11 +12,8 @@ from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_E
 
 class LoggerPrinter():
     """ Handles all logging and printing for mesh gateway"""
-    def __init__(self):
+    def __init__(self, log_file):
         """ Init function"""
-        config = configparser.ConfigParser()
-        config.read('gateway.cfg')
-        log_file = config.get('general', 'log_file')
 
         logging.basicConfig(filename=log_file,
                             format='%(asctime)s %(message)s',

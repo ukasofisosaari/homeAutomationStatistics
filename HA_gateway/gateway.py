@@ -37,7 +37,9 @@ class MeshGateway():
         self._baudrate = config.get('general', 'Baudrate')
         # Key is sensor id, value is array of sensor data
         self._sensors_data_dict = {}
-        self._logger = LoggerPrinter()
+        log_file = config.get('general', 'log_file')
+        self._logger = LoggerPrinter(log_file)
+        self._mqtt_client = None
 
     def _openSerialConnection(self):
         """ Open serial connection"""
@@ -64,13 +66,12 @@ class MeshGateway():
         while 1 and self._ser:
             try:
                 line = str(self._ser.readline())
-            except serial.serialutil.SerialException:
-                exit(2)
-                self._logger.loggingPrinting(line,
+                message_data = self._parse_data_package(line)
+                if len(message_data.keys()) > 0:
+                    self._processData(message_data)
+            except serial.serialutil.SerialException as e:
+                self._logger.loggingPrinting(f"Serial Exception: {e}",
                                 LOGGING_LEVEL_ERROR)
-            message_data = self._parse_data_package(line)
-            if len(message_data.keys()) > 0:
-                self._processData(message_data)
 
 
     def _processData(self, message_data):
@@ -87,9 +88,11 @@ class MeshGateway():
         if len(self._sensors_data_dict[message_data['node_id']]) == self._n_samples:
             sensor_data_average = self._averageSensorValues(message_data['node_id'],
                                                             self._sensors_data_dict)
-            self._post_to_mqtt_broker( sensor_data_average)
-            self._sensors_data_dict[message_data['node_id']].clear()
-            print(self._sensors_data_dict[message_data['node_id']])
+            # If mqtt_client is None, this could be used to just collect data. Lots of data.
+            if self._mqtt_client:
+                self._post_to_mqtt_broker( sensor_data_average)
+                self._sensors_data_dict[message_data['node_id']].clear()
+                print(self._sensors_data_dict[message_data['node_id']])
 
     def _parse_data_package(self, line):
         """ Parses data packages gateway receives from mesh"""
