@@ -11,6 +11,11 @@ Sensor mesh messages forwared as MQTT messages.
 
 TODO
 
+### Building
+To build docker image, run:
+docker build --tag mesh-gateway .
+docker tag mesh-gateway:latest mesh-gateway:<version number>
+
 ### Installing
 
 TODO
