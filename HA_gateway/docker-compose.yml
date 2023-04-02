@@ -7,4 +7,6 @@ services:
     volumes:
       - ./gateway.cfg:/opt/mesh-gateway/gateway.cfg:ro
       - ./node.json:/opt/mesh-gateway/node.json:ro
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0:r
     restart: unless-stopped
