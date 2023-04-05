@@ -288,3 +288,4 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 HA_gateway/nodes.json
+mesh_gateway/nodes.json
