@@ -14,13 +14,14 @@
 #define   MESH_PASSWORD   "password"
 #define   MESH_PORT       5555
 
-
 enum meshNodeType {
   MESH_GATEWAY = 1,
-  MESH_DHT_NODE= 2,
+  MESH_WEMOS_DHT12_NODE= 2,
   MESH_DS18B20_NODE= 3,
+  MESH_WEMOS_SHT3X_NODE= 4,
   MESH_UNKNOWN = 0
 };
+
 void sendMessage() ;
 meshNodeType node_type = MESH_DS18B20_NODE;
 Scheduler userScheduler;

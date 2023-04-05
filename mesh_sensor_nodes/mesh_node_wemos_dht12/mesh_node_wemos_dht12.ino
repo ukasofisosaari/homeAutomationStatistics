@@ -16,11 +16,13 @@
 
 enum meshNodeType {
   MESH_GATEWAY = 1,
-  MESH_DHT_WEMOS= 2,
+  MESH_WEMOS_DHT12_NODE= 2,
   MESH_DS18B20_NODE= 3,
+  MESH_WEMOS_SHT3X_NODE= 4,
   MESH_UNKNOWN = 0
 };
-meshNodeType node_type = MESH_DHT_WEMOS;
+
+meshNodeType node_type = MESH_WEMOS_DHT12_NODEDHT_WEMOS;
 
 void sendMessage() ;
 Scheduler userScheduler;

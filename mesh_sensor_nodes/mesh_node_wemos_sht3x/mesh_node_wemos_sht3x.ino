@@ -7,8 +7,10 @@
 //
 //************************************************************
 #include <painlessMesh.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include <WEMOS_SHT3X.h>
+
+//include "mesh_node.h"
+SHT3X sht30(0x45);
 
 #define   MESH_PREFIX     "HakalaSensorNode"
 #define   MESH_PASSWORD   "password"
@@ -17,38 +19,41 @@
 
 enum meshNodeType {
   MESH_GATEWAY = 1,
-  MESH_DHT_NODE= 2,
+  MESH_WEMOS_DHT12_NODE= 2,
   MESH_DS18B20_NODE= 3,
+  MESH_WEMOS_SHT3X_NODE= 4,
   MESH_UNKNOWN = 0
 };
+
 void sendMessage() ;
 meshNodeType node_type = MESH_DS18B20_NODE;
 Scheduler userScheduler;
 painlessMesh  mesh;
 Task taskSendMessage( TASK_SECOND * 600 , TASK_FOREVER, &sendMessage );
 
-// GPIO where the DS18B20 is connected to
-const int oneWireBus = 4;     
 
-// Setup a oneWire instance to communicate with any OneWire devices
-OneWire oneWire(oneWireBus);
-
-// Pass our oneWire reference to Dallas Temperature sensor 
-DallasTemperature sensors(&oneWire);
 
 void sendMessage() {
     String msg = ";";
-    sensors.requestTemperatures(); 
-    float temperatureC = sensors.getTempCByIndex(0);
+    if(sht30.get()==0){
+      float cTem = sht30.cTemp;
+      float hum = sht30.humidity;
+      Serial.println();
+      msg += mesh.getNodeId();
+      msg +=";H;" + String(hum) + ";T;" + String(cTem) + ";\n";
       
-    msg += mesh.getNodeId();
-    msg +=";H;NO_HUMIDITY;T;" + String(temperatureC) + ";\n";
     
-  
-    mesh.sendBroadcast( msg );
+      mesh.sendBroadcast( msg );
+      
+      Serial.printf(" Sent message;%s", msg.c_str());
+      taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+    }
+    else
+    {
+      Serial.println("Error!");
+    }
+      
     
-    Serial.printf(" Sent message;%s", msg.c_str());
-    taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
 void receivedCallback( uint32_t from, String &msg ) {
