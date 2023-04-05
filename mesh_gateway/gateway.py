@@ -132,8 +132,8 @@ class MeshGateway():
         for data_sample in sensors_data_dict[node_id]:
             temperature_average += float(data_sample['temperature'])
             humidity_average += float(data_sample['humidity'])
-        temperature_average = temperature_average / self._sampling_count
-        humidity_average = humidity_average / self._sampling_count
+        temperature_average = round( temperature_average / self._sampling_count, 2)
+        humidity_average = round( humidity_average / self._sampling_count, 2)
         sensor_data_average['temperature'] = str(temperature_average)
         sensor_data_average['humidity'] = str(humidity_average)
         self._logger.loggingPrinting(sensor_data_average,
@@ -172,6 +172,8 @@ class MeshGateway():
             pass
 
         try:
+            if not self._mqtt_client:
+                self.connect2MQTTBroker()
             rc, mid = self._mqtt_client.publish(f"hakala/{location}/hum",
                                           sensor_data_dict[HUMIDITY_KEY])
             if rc == MQTT_ERR_NO_CONN:
