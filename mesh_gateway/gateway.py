@@ -16,7 +16,7 @@ import paho.mqtt.client as paho
 from paho.mqtt.client import MQTT_ERR_SUCCESS, MQTT_ERR_NO_CONN
 
 from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_ERROR
-from definitions import NODE_ID_KEY, TEMPERATURE_KEY, HUMIDITY_KEY
+from definitions import NODE_ID_KEY, PUBLISH_DATATYPE_TOPICS
 from logger import LoggerPrinter
 
 class MeshGateway():
@@ -29,13 +29,14 @@ class MeshGateway():
         config.read('gateway.cfg')
         self._mqtt_broker = config.get('general', 'MqttBroker')
         self._mqtt_port = int(config.get('general', 'MqttPort'))
-        self._sampling_count = float(config.get('general', 'sampling_count'))
+        self._sampling_count = float(config.get('general', 'SamplingCount'))
         self._serial_port = config.get('general', 'SerialPort')
         self._baudrate = config.get('general', 'Baudrate')
         # Key is sensor id, value is array of sensor data
         self._sensors_data_dict = {}
-        log_file = config.get('general', 'log_file')
-        self._logger = LoggerPrinter(log_file)
+        log_file = config.get('general', 'logFile')
+        log_level = config.get('general', 'LogLevel')
+        self._logger = LoggerPrinter(log_file, log_level)
         self._mqtt_client = None
         self._nodes = None
         try:
@@ -72,7 +73,7 @@ class MeshGateway():
             try:
                 line = str(self._ser.readline())
                 message_data = self._parse_data_package(line)
-                if len(message_data.keys()) > 0:
+                if message_data and len(message_data.keys()) > 0:
                     self._processData(message_data)
             except serial.serialutil.SerialException as e:
                 self._logger.loggingPrinting(f"Serial Exception: {e}",
@@ -86,8 +87,13 @@ class MeshGateway():
             self._logger.loggingPrinting("Sample number: {0} for sensor {1}".format(
                 str(len(self._sensors_data_dict[message_data['node_id']])),
                 message_data['node_id']),
-                            LOGGING_LEVEL_INFO)
+                            LOGGING_LEVEL_DEBUG)
         except KeyError:
+            self._logger.loggingPrinting(
+                f"Node {message_data['node_id']} located at:"
+                    f"{self._nodes[message_data['node_id']]} "
+                    "sent its first package",
+                LOGGING_LEVEL_INFO)
             self._sensors_data_dict[message_data['node_id']] = []
 
         if len(self._sensors_data_dict[message_data['node_id']]) == self._sampling_count:
@@ -105,10 +111,18 @@ class MeshGateway():
         sensor_data = {}
         if len(mesh_msg) > 1 and mesh_msg[1] == 'R':
             self._logger.loggingPrinting(mesh_msg,
-                            LOGGING_LEVEL_INFO)
+                            LOGGING_LEVEL_DEBUG)
             for i, value in enumerate(mesh_msg):
                 if value == 'R':
                     sensor_data['node_id'] = mesh_msg[i + 1]
+                    if sensor_data['node_id'] not in self._nodes:
+                        self._logger.loggingPrinting(
+                            f"No location for mesh node {sensor_data['node_id']} found",
+                            LOGGING_LEVEL_INFO)
+                        self._logger.loggingPrinting(
+                            "Regenerate json and restart gateway service",
+                            LOGGING_LEVEL_INFO)
+                        return None
                 elif value == 'H':
                     sensor_data['humidity'] = mesh_msg[i + 1]
                 elif value == 'T':
@@ -120,7 +134,7 @@ class MeshGateway():
         """ Calculates average values for sensor data"""
         self._logger.loggingPrinting(
             f"Got {self._sampling_count} samples, calculating average",
-                        LOGGING_LEVEL_INFO)
+                        LOGGING_LEVEL_DEBUG)
         sensor_data_average = {}
 
         # Set id and current time
@@ -137,57 +151,30 @@ class MeshGateway():
         sensor_data_average['temperature'] = str(temperature_average)
         sensor_data_average['humidity'] = str(humidity_average)
         self._logger.loggingPrinting(sensor_data_average,
-                        LOGGING_LEVEL_INFO)
+                        LOGGING_LEVEL_DEBUG)
         return sensor_data_average
 
     def _post_to_mqtt_broker(self, sensor_data_dict):
         """ Method for posting to MQTT broker """
-        try:
-            location = self._nodes[sensor_data_dict[NODE_ID_KEY]]
-        except KeyError:
-            self._logger.loggingPrinting(
-                f"No location for mesh node {sensor_data_dict[NODE_ID_KEY]} found",
-                LOGGING_LEVEL_INFO)
-            self._logger.loggingPrinting(
-                "Regenerate json and restart gateway service",
-                LOGGING_LEVEL_INFO)
-        try:
-            rc, mid = self._mqtt_client.publish(f"hakala/{location}/temp",
-                                          sensor_data_dict[TEMPERATURE_KEY])
-            if rc == MQTT_ERR_NO_CONN:
-                self._logger.loggingPrinting(
-                    "No connection MQTT broker",
-                    LOGGING_LEVEL_ERROR)
-                self._mqtt_client.disconnect()
-                self._mqtt_client = self.connect2MQTTBroker()
-            elif rc == MQTT_ERR_SUCCESS:
-                self._logger.loggingPrinting(
-                    f"Published to 'hakala/{location}/temp'",
-                    LOGGING_LEVEL_DEBUG)
-            else:
-                self._logger.loggingPrinting(f"Unkown publish rc value {rc}",
-                                LOGGING_LEVEL_INFO)
+        location = self._nodes[sensor_data_dict[NODE_ID_KEY]]
+        for publish_datatype in PUBLISH_DATATYPE_TOPICS.keys():
+            if PUBLISH_DATATYPE_TOPICS[publish_datatype] in sensor_data_dict.keys():
+                rc, mid = self._mqtt_client.publish(f"hakala/{location}/{publish_datatype}",
+                                                    sensor_data_dict[PUBLISH_DATATYPE_TOPICS[publish_datatype]])
+                if rc == MQTT_ERR_NO_CONN:
+                    self._logger.loggingPrinting(
+                        "No connection MQTT broker",
+                        LOGGING_LEVEL_ERROR)
+                    self._mqtt_client.disconnect()
+                    self._mqtt_client = self.connect2MQTTBroker()
+                elif rc == MQTT_ERR_SUCCESS:
+                    self._logger.loggingPrinting(
+                        f"Published to 'hakala/{location}/{publish_datatype}'",
+                        LOGGING_LEVEL_DEBUG)
+                else:
+                    self._logger.loggingPrinting(f"Unkown publish rc value {rc}",
+                                                 LOGGING_LEVEL_ERROR)
 
-        except KeyError:
-            pass
-
-        try:
-            if not self._mqtt_client:
-                self.connect2MQTTBroker()
-            rc, mid = self._mqtt_client.publish(f"hakala/{location}/hum",
-                                          sensor_data_dict[HUMIDITY_KEY])
-            if rc == MQTT_ERR_NO_CONN:
-                self._logger.loggingPrinting("No connection MQTT broker", LOGGING_LEVEL_ERROR)
-                self._mqtt_client.disconnect()
-                mqtt_client = self.connect2MQTTBroker()
-            elif rc == MQTT_ERR_SUCCESS:
-                self._logger.loggingPrinting(f"Published to 'hakala/{location}/hum'",
-                                LOGGING_LEVEL_DEBUG)
-            else:
-                self._logger.loggingPrinting(f"Unkown publish rc value {rc}",
-                                LOGGING_LEVEL_INFO)
-        except KeyError:
-            pass
 
     def connect2MQTTBroker(self):
         """ Handles connecting to MQTT broker"""

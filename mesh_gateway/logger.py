@@ -7,18 +7,20 @@
 import configparser
 import logging
 
-from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_ERROR
+from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, \
+    LOGGING_LEVEL_ERROR, LOG_LEVEL_DICT
 
 
 class LoggerPrinter():
     """ Handles all logging and printing for mesh gateway"""
-    def __init__(self, log_file):
+    def __init__(self, log_file, log_level):
         """ Init function"""
-
+        if log_level not in LOG_LEVEL_DICT.keys():
+            print(f"Log level: {log_level} not valid: {LOG_LEVEL_DICT}")
         logging.basicConfig(filename=log_file,
-                            format='%(asctime)s %(message)s',
+                            format='%(asctime)s [%(levelname)s]: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p',
-                            level=logging.DEBUG)
+                            level=LOG_LEVEL_DICT[log_level])
 
     def loggingPrinting(self, msg, level):
         """ Logs to logfile and prints it as well"""
