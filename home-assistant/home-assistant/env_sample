@@ -1,0 +1,4 @@
+MYSQL_ROOT_PASSWORD=<Select password>
+HA_MYSQL_PASSWORD=<select password>
+PUID=1000
+PGID=1000
