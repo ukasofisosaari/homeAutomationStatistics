@@ -1,17 +1,17 @@
+#!/usr/bin/env python3
 """
+    Simple logging module.
     author: Saku Rautiainen
     saku.rautiainen@iki.fi
  """
 
-# !/usr/bin/env python3
-import configparser
 import logging
 
 from definitions import LOGGING_LEVEL_INFO, LOGGING_LEVEL_DEBUG, \
     LOGGING_LEVEL_ERROR, LOG_LEVEL_DICT
 
 
-class LoggerPrinter():
+class LoggerPrinter:
     """ Handles all logging and printing for mesh gateway"""
     def __init__(self, log_file, log_level):
         """ Init function"""
@@ -22,7 +22,8 @@ class LoggerPrinter():
                             datefmt='%m/%d/%Y %I:%M:%S %p',
                             level=LOG_LEVEL_DICT[log_level])
 
-    def loggingPrinting(self, msg, level):
+    @staticmethod
+    def logging_printing(msg, level):
         """ Logs to logfile and prints it as well"""
         if level == LOGGING_LEVEL_INFO:
             logging.info(msg)
