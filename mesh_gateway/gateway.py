@@ -45,8 +45,9 @@ class MeshGateway:
             nodes_file = open("nodes.json")
             self._nodes = json.load(nodes_file)
         except FileNotFoundError:
-            self._logger.loggingPrinting("No nodes.json file found, generate it first",
-                                         LOGGING_LEVEL_INFO)
+            self._logger.logging_printing(
+                "No nodes.json file found, generate it first",
+                LOGGING_LEVEL_INFO)
             exit()
 
     def _open_serial_connection(self):
@@ -60,11 +61,11 @@ class MeshGateway:
                 bytesize=serial.EIGHTBITS,
                 timeout=1
             )
-            self._logger.loggingPrinting(
+            self._logger.logging_printing(
                 "Serial connection opened",
                 LOGGING_LEVEL_INFO)
         except serial.SerialException as error:
-            self._logger.loggingPrinting(
+            self._logger.logging_printing(
                 f"No device on serial port: {self._serial_port}, error: {error}",
                 LOGGING_LEVEL_ERROR)
             self._ser = None
@@ -79,7 +80,7 @@ class MeshGateway:
                 if message_data and len(message_data.keys()) > 0:
                     self._process_data(message_data)
             except serial.serialutil.SerialException as e:
-                self._logger.loggingPrinting(
+                self._logger.logging_printing(
                     f"Serial Exception: {e}",
                     LOGGING_LEVEL_ERROR)
 
@@ -87,12 +88,12 @@ class MeshGateway:
         """ Process Data """
         try:
             self._sensors_data_dict[message_data['node_id']].append(message_data)
-            self._logger.loggingPrinting("Sample number: {0} for sensor {1}".format(
+            self._logger.logging_printing("Sample number: {0} for sensor {1}".format(
                 str(len(self._sensors_data_dict[message_data['node_id']])),
                 message_data['node_id']),
                             LOGGING_LEVEL_DEBUG)
         except KeyError:
-            self._logger.loggingPrinting(
+            self._logger.logging_printing(
                 f"Node {message_data['node_id']} located at:"
                 f"{self._nodes[message_data['node_id']]} "
                 "sent its first package",
@@ -112,17 +113,17 @@ class MeshGateway:
         mesh_msg = line.split(';')
         sensor_data = {}
         if len(mesh_msg) > 1 and mesh_msg[1] == 'R':
-            self._logger.loggingPrinting(
+            self._logger.logging_printing(
                 mesh_msg,
                 LOGGING_LEVEL_DEBUG)
             for i, value in enumerate(mesh_msg):
                 if value == 'R':
                     sensor_data['node_id'] = mesh_msg[i + 1]
                     if sensor_data['node_id'] not in self._nodes:
-                        self._logger.loggingPrinting(
+                        self._logger.logging_printing(
                             f"No location for mesh node {sensor_data['node_id']} found",
                             LOGGING_LEVEL_INFO)
-                        self._logger.loggingPrinting(
+                        self._logger.logging_printing(
                             "Regenerate json and restart gateway service",
                             LOGGING_LEVEL_INFO)
                         return None
@@ -135,7 +136,7 @@ class MeshGateway:
 
     def _average_sensor_values(self, node_id, sensors_data_dict):
         """ Calculates average values for sensor data"""
-        self._logger.loggingPrinting(
+        self._logger.logging_printing(
             f"Got {self._sampling_count} samples, calculating average",
             LOGGING_LEVEL_DEBUG)
         sensor_data_average = {
@@ -154,7 +155,7 @@ class MeshGateway:
         humidity_average = round(humidity_average / self._sampling_count, 2)
         sensor_data_average['temperature'] = str(temperature_average)
         sensor_data_average['humidity'] = str(humidity_average)
-        self._logger.loggingPrinting(
+        self._logger.logging_printing(
             sensor_data_average,
             LOGGING_LEVEL_DEBUG)
         return sensor_data_average
@@ -167,24 +168,25 @@ class MeshGateway:
                 rc, mid = self._mqtt_client.publish(f"hakala/{location}/{publish_datatype}",
                                                     sensor_data_dict[PUBLISH_DATATYPE_TOPICS[publish_datatype]])
                 if rc == MQTT_ERR_NO_CONN:
-                    self._logger.loggingPrinting(
+                    self._logger.logging_printing(
                         "No connection MQTT broker",
                         LOGGING_LEVEL_ERROR)
                     self._mqtt_client.disconnect()
                     self.connect_2_mqtt_broker()
                 elif rc == MQTT_ERR_SUCCESS:
-                    self._logger.loggingPrinting(
+                    self._logger.logging_printing(
                         f"Published to 'hakala/{location}/{publish_datatype}'",
                         LOGGING_LEVEL_DEBUG)
                 else:
-                    self._logger.loggingPrinting(f"Unknown publish rc value {rc}",
-                                                 LOGGING_LEVEL_ERROR)
+                    self._logger.logging_printing(
+                        f"Unknown publish rc value {rc}",
+                        LOGGING_LEVEL_ERROR)
 
     def connect_2_mqtt_broker(self):
         """ Handles connecting to MQTT broker"""
         self._mqtt_client = paho.Client("mesh_gateway")
         not_connected = True
-        self._logger.loggingPrinting(
+        self._logger.logging_printing(
             "Trying to connect to MQTT broker",
             LOGGING_LEVEL_INFO)
         while not_connected:
@@ -194,7 +196,7 @@ class MeshGateway:
 
                 print("B")
                 not_connected = False
-                self._logger.loggingPrinting(
+                self._logger.logging_printing(
                     "Connection with MQTT broker made",
                     LOGGING_LEVEL_INFO)
             except ConnectionRefusedError:
@@ -203,15 +205,3 @@ class MeshGateway:
             except socket.timeout:
                 print("C")
                 pass
-
-
-def main():
-    """ Main function """
-    gateway = MeshGateway()
-    gateway.connect_2_mqtt_broker()
-    gateway.listen_and_crunch()
-
-
-if __name__ == "__main__":
-    # execute only if run as a script
-    main()
